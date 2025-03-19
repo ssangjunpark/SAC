@@ -1,0 +1,11 @@
+tensorflow
+gymnasium
+ale-py
+moviepy
+pygame
+numpy
+scipy
+matplotlib
+pandas
+swig 
+"gymnasium[box2d]"
