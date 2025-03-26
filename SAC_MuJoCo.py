@@ -280,7 +280,7 @@ def train(env):
     update_period_timestep = 50
     total_time_steps = 0
 
-    max_num_steps_per_episode = 1000
+    max_num_steps_per_episode = 4000
     current_episode_time_steps = 0
 
     rewards = np.zeros(shape=num_episodes)
