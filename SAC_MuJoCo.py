@@ -320,7 +320,7 @@ def train(env):
     return rewards
 
 def main():
-    env = gym.make('HalfCheetah-v5', render_mode='rgb_array')
+    env = gym.make('HalfCheetah-v5', render_mode='human')
     # env = RecordVideo(env, episode_trigger= lambda x : True, video_folder='saves')
     rewards = train(env)
 

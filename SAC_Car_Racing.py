@@ -228,12 +228,12 @@ class SAC:
             a1, lpi1 = self.pi.sample_action(s)
 
             q_1_a1_v = self.Q1(s, a1)
-            q_2_a1_v = self.Q2(s, a2)
+            q_2_a1_v = self.Q2(s, a1)
 
             compare_q_a1_v = tf.minimum(q_1_a1_v, q_2_a1_v)
 
             # gradient ascent thus negative sign 
-            pi_loss = -tf.reduce_sum((compare_q_a1_v - self.alpha * lpi1)**2)
+            pi_loss = -tf.reduce_sum(compare_q_a1_v - self.alpha * lpi1)
         
         pi_grad = tape.gradient(pi_loss, self.pi.trainable_variables)
         self.pi_optim.apply_gradients(zip(pi_grad, self.pi.trainable_variables))
@@ -279,7 +279,7 @@ def train(env):
 
     agent = SAC(observation_shape, action_space_dim)
 
-    init_steps = 10000
+    init_steps = 1000
     # init_steps = 300
     init_steps_counter = 0
     # to fill the buffer (and for stacking if implemenetd later)
@@ -308,7 +308,7 @@ def train(env):
     update_period_timestep = 50
     total_time_steps = 0
 
-    max_num_steps_per_episode = 1000
+    max_num_steps_per_episode = 4000
     current_episode_time_steps = 0
 
     rewards = np.zeros(shape=num_episodes)
