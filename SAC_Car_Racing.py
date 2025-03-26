@@ -303,11 +303,13 @@ def train(env):
                 print(f"Buffer filled: {init_steps_counter} time steps. Start Training")   
                 break
 
-
     num_episodes = 1000
     # num_episodes = 3
     update_period_timestep = 50
     total_time_steps = 0
+
+    max_num_steps_per_episode = 1000
+    current_episode_time_steps = 0
 
     rewards = np.zeros(shape=num_episodes)
 
@@ -331,10 +333,16 @@ def train(env):
             observation = observation2
             ep_reward += reward
             total_time_steps += 1
+	        
+            current_episode_time_steps += 1
 
             if (total_time_steps % update_period_timestep == 0):
                 agent.update()
-            
+           
+            if (current_episode_time_steps >= max_num_steps_per_episode):
+                break
+        
+        current_episode_time_steps = 0
         rewards[episode] = ep_reward
         print(f"Episode {episode}, Reward {ep_reward}, Time Taken: {datetime.now() - start_time}, Total Timesteps: {total_time_steps}")
 
@@ -350,6 +358,6 @@ def main():
     plt.plot(rewards)
     plt.savefig('results')
 
-
 if __name__ == "__main__":
     main()
+
