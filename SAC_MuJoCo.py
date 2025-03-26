@@ -110,7 +110,7 @@ class PolicyPi(tf.keras.Model):
         self.mu = layers.Dense(action_space_dim, activation=None)
 
         # will later be expontinated to get the regular std value to ensure +ve
-        self.log_std = layers.Dense(1, activation=None)
+        self.log_std = layers.Dense(action_space_dim, activation=None)
 
     def call(self, state):
         x = state
