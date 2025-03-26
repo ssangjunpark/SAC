@@ -222,12 +222,12 @@ class SAC:
             a1, lpi1 = self.pi.sample_action(s)
 
             q_1_a1_v = self.Q1(s, a1)
-            q_2_a1_v = self.Q2(s, a2)
+            q_2_a1_v = self.Q2(s, a1)
 
             compare_q_a1_v = tf.minimum(q_1_a1_v, q_2_a1_v)
 
             # gradient ascent thus negative sign 
-            pi_loss = -tf.reduce_sum((compare_q_a1_v - self.alpha * lpi1)**2)
+            pi_loss = -tf.reduce_sum(compare_q_a1_v - self.alpha * lpi1)
         
         pi_grad = tape.gradient(pi_loss, self.pi.trainable_variables)
         self.pi_optim.apply_gradients(zip(pi_grad, self.pi.trainable_variables))
