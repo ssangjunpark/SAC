@@ -193,7 +193,7 @@ class SAC:
         self.pi_optim = tf.keras.optimizers.Adam(self.pi_lr)
 
     @tf.function
-    def update(self, batch_size=100):
+    def update(self, batch_size=256):
         batch = self.replayMemoryBuffer.sample_batch(batch_size)
         s, a, r, s2, d = batch['s'], batch['a'], batch['r'], batch['s2'], batch['d']
 
@@ -253,7 +253,7 @@ def train(env):
 
     agent = SAC(observation_shape, action_space_dim)
 
-    init_steps = 1000
+    init_steps = 10000
     # init_steps = 300
     init_steps_counter = 0
     # to fill the buffer (and for stacking if implemenetd later)
@@ -277,7 +277,7 @@ def train(env):
 
     num_episodes = 1000
     # num_episodes = 3
-    update_period_timestep = 50
+    update_period_timestep = 1
     total_time_steps = 0
 
     max_num_steps_per_episode = 4000
