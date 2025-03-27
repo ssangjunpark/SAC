@@ -84,7 +84,7 @@ class QValue(tf.keras.Model):
         final_q = self.final_q(x)
 
         return final_q
-    
+
 class PolicyPi(tf.keras.Model):
     # details about reparameterization, tanh squashing and gaussian log
     # https://spinningup.openai.com/en/latest/algorithms/sac.html
@@ -275,7 +275,7 @@ def train(env):
                 print(f"Buffer filled: {init_steps_counter} time steps. Start Training")   
                 break
 
-    num_episodes = 1000
+    num_episodes = 100000
     # num_episodes = 3
     update_period_timestep = 1
     total_time_steps = 0
@@ -314,19 +314,54 @@ def train(env):
         
         current_episode_time_steps = 0
         rewards[episode] = ep_reward
+    
+        if (episode % 500 == 0):
+            agent.pi.save_weights(f'weights/weights{episode}t.weights.h5')
+
         print(f"Episode {episode}, Reward {ep_reward}, Time Taken: {datetime.now() - start_time}, Total Timesteps: {total_time_steps}")
 
     env.close()
     return rewards
 
+def test(env, path):
+    observation_shape = env.observation_space.shape
+    action_space_dim = env.action_space.shape[0]
+
+    agent = SAC(observation_shape, action_space_dim)
+
+    observation, _ = env.reset()
+
+    observation_tensor = tf.convert_to_tensor(np.expand_dims(observation, axis=0), dtype=tf.float32)
+    agent.pi(observation_tensor)
+
+    agent.pi.load_weights(path)
+
+    total_reward = 0
+
+    done = False
+
+    while not done:
+        obs_tensor = tf.convert_to_tensor(np.expand_dims(observation, axis=0), dtype=tf.float32)
+        action, _ = agent.pi.sample_action(obs_tensor)
+        observation, reward, done, _, _ = env.step(action.numpy()[0])
+        total_reward += reward
+    
+
+    print("Final reward: ", total_reward)
+
+    env.close()
+
+
 def main():
-    env = gym.make('HalfCheetah-v5', render_mode='rgb_array')
-    # env = RecordVideo(env, episode_trigger= lambda x : True, video_folder='saves')
+    # env = gym.make('HalfCheetah-v5', render_mode='rgb_array')
+    env = gym.make('Humanoid-v5', render_mode='rgb_array')
+    # env = RecordVideo(env, episode_trigger= lambda x : x % 5 == 0, video_folder='saves')
     rewards = train(env)
 
     plt.plot(rewards)
     plt.savefig('results')
 
 if __name__ == "__main__":
+    # env = gym.make('Humanoid-v5', render_mode='human')
+    # test(env, 'weights/weights4t.weights.h5')
     main()
-
