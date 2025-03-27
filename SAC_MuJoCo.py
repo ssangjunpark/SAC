@@ -144,11 +144,11 @@ class PolicyPi(tf.keras.Model):
         # dropped constnats since will be part of lr anyways
         log_gaussian = -0.5 * ( ( (a_bar - mu)/(std+1e-6) )**2 + 2*tf.math.log(std+1e-6) + np.log(2*np.pi)  )
 
-        log_gaussian = tf.reduce_sum(log_gaussian, axis=1, keepdims=True)
+        log_gaussian = tf.reduce_mean(log_gaussian, axis=1, keepdims=True)
 
         # seemse like correction is required after reparameterization
         # https://github.com/haarnoja/sac/blob/master/sac/policies/gaussian_policy.py#L74
-        log_squash = tf.reduce_sum( tf.math.log(1 - action**2 + 1e-6), axis=1, keepdims=True )
+        log_squash = tf.reduce_mean( tf.math.log(1 - action**2 + 1e-6), axis=1, keepdims=True )
 
         log_prob = log_gaussian - log_squash
 
@@ -209,8 +209,8 @@ class SAC:
             q_1_v = self.Q1(s, a)
             q_2_v = self.Q2(s, a)
 
-            q_1_loss = tf.reduce_sum((q_1_v - y) ** 2)
-            q_2_loss = tf.reduce_sum((q_2_v - y) ** 2)
+            q_1_loss = tf.reduce_mean((q_1_v - y) ** 2)
+            q_2_loss = tf.reduce_mean((q_2_v - y) ** 2)
 
         q_1_grad = tape.gradient(q_1_loss, self.Q1.trainable_variables)
         q_2_grad = tape.gradient(q_2_loss, self.Q2.trainable_variables)
@@ -227,7 +227,7 @@ class SAC:
             compare_q_a1_v = tf.minimum(q_1_a1_v, q_2_a1_v)
 
             # gradient ascent thus negative sign 
-            pi_loss = -tf.reduce_sum(compare_q_a1_v - self.alpha * lpi1)
+            pi_loss = -tf.reduce_mean(compare_q_a1_v - self.alpha * lpi1)
         
         pi_grad = tape.gradient(pi_loss, self.pi.trainable_variables)
         self.pi_optim.apply_gradients(zip(pi_grad, self.pi.trainable_variables))
